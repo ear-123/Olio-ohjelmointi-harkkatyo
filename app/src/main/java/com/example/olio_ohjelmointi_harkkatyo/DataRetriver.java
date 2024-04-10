@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DataRetriver {
+    private HashMap<String, String> stateNamesToCodes;
+
 
     public ArrayList<StateData> getStateData(Context context, String stateName){
 
@@ -53,9 +55,6 @@ public class DataRetriver {
         }
 
         String code = null;
-
-
-        code = null;
         code = municipalityCodes.get(stateName);
 
 

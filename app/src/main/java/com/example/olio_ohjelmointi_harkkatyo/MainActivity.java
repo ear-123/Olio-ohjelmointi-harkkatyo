@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private Button searchButton;
     private TextView testText;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,19 +48,24 @@ public class MainActivity extends AppCompatActivity {
     public void onSearchButtonClick(View view) {
         //Log.d("TEST", "Nappula toimii");
 
-        final Boolean[] dataFound = {false};
 
         Context context = this;
         DataRetriver dataRetriver = new DataRetriver();
         String stateName = searchBar.getText().toString();
+
         ExecutorService service = Executors.newSingleThreadExecutor();
 
         service.execute(new Runnable() {
             @Override
             public void run() {
+                Fragment fragment;
                 ArrayList<StateData> populationData = dataRetriver.getStateData(context, stateName);
+                Log.d("TEST","test");
 
                 if (populationData == null) {
+                    fragment = new StateDataNotFoundFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, fragment).commit();
+
                     return;
                 }
                 runOnUiThread(new Runnable() {
@@ -74,19 +80,18 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-                dataFound[0] = true;
+
 
                 Log.d("TEST", "Data haettu");
+                fragment = new StateDataFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, fragment).commit();
+
             }
         });
 
-        Fragment fragment;
 
-        if(dataFound[0]){
-            fragment = new StateDataFragment();
-        } else {
-            fragment = new StateDataNotFoundFragment();
-        }
+
+
 
 
     }
