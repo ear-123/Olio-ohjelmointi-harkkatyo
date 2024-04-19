@@ -19,8 +19,9 @@ public class DataRetriver {
     private HashMap<String, String> stateNamesToCodes;
 
 
-    public ArrayList<StateData> getStateData(Context context, String stateName){
+    public void getStateData(Context context, String stateName){
 
+        StateDataStorage.getInstance().getStateData().clear();
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -97,13 +98,11 @@ public class DataRetriver {
                 populations.add(node.asText());
             }
 
-            ArrayList<StateData> populationData = new ArrayList<>();
 
             for(int i = 0; i < years.size(); i++) {
-                populationData.add(new StateData(Integer.valueOf(years.get(i)), Integer.valueOf(populations.get(i))));
+                StateDataStorage.getInstance().getStateData().add(new StateData(Integer.valueOf(years.get(i)), Integer.valueOf(populations.get(i)), 1, "test", "test"));
             }
 
-            return populationData;
 
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
@@ -113,7 +112,6 @@ public class DataRetriver {
             e.printStackTrace();
         }
 
-        return null;
 
     }
 }

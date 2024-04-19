@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment;
 import com.example.olio_ohjelmointi_harkkatyo.fragments.StateDataFragment;
 import com.example.olio_ohjelmointi_harkkatyo.fragments.StateDataNotFoundFragment;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.itemView), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -59,20 +58,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Fragment fragment;
-                ArrayList<StateData> populationData = dataRetriver.getStateData(context, stateName);
-                Log.d("TEST","test");
+                dataRetriver.getStateData(context, stateName);
+                //Log.d("TEST","test");
 
-                if (populationData == null) {
+                if (StateDataStorage.getInstance().getStateData().isEmpty()) {
                     fragment = new StateDataNotFoundFragment();
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, fragment).commit();
-
+                    Log.d("TEST", "Dataa ei löytynyt");
                     return;
                 }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String s = "";
-                        for (StateData data : populationData) {
+                        for (StateData data : StateDataStorage.getInstance().getStateData()) {
                             s = s + data.getYear() + ": " + data.getPopulation() + "\n";
                         }
                         testText.setText(s);
