@@ -5,7 +5,7 @@
       "selection": {
         "filter": "item",
         "values": [
-          "Korvaa tämä"
+          "Replace this"
         ]
       }
     },
@@ -14,7 +14,7 @@
       "selection": {
         "filter": "item",
         "values": [
-          "vaesto"
+          "valisays"
         ]
       }
     }

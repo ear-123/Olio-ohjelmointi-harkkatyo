@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.olio_ohjelmointi_harkkatyo.fragments.StateDataFragment;
+import com.example.olio_ohjelmointi_harkkatyo.fragments.StateDataHeadlineFragment;
 import com.example.olio_ohjelmointi_harkkatyo.fragments.StateDataNotFoundFragment;
 
 import java.util.concurrent.ExecutorService;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         searchBar = findViewById(R.id.editTextSearchBar);
         searchButton = findViewById(R.id.buttonSearch);
-        testText = findViewById(R.id.testText);
+        //testText = findViewById(R.id.testText);
     }
 
 
@@ -49,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         Context context = this;
-        DataRetriver dataRetriver = new DataRetriver();
         String stateName = searchBar.getText().toString();
 
         ExecutorService service = Executors.newSingleThreadExecutor();
@@ -57,33 +57,31 @@ public class MainActivity extends AppCompatActivity {
         service.execute(new Runnable() {
             @Override
             public void run() {
-                Fragment fragment;
-                dataRetriver.getStateData(context, stateName);
-                //Log.d("TEST","test");
 
-                if (StateDataStorage.getInstance().getStateData().isEmpty()) {
-                    fragment = new StateDataNotFoundFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, fragment).commit();
+                try {
+                    DataRetriver.getInstance().getStateData(context, stateName);
+                } catch (NullPointerException e){
+                    Fragment fragment = new StateDataNotFoundFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewHeadline, fragment).commit();
                     Log.d("TEST", "Dataa ei löytynyt");
                     return;
                 }
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String s = "";
-                        for (StateData data : StateDataStorage.getInstance().getStateData()) {
-                            s = s + data.getYear() + ": " + data.getPopulation() + "\n";
-                        }
-                        testText.setText(s);
+                        Log.d("TEST", "Data haettu");
+                        Fragment headline = new StateDataHeadlineFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewHeadline, headline).commit();
+                        Fragment stateDataFragment = new StateDataFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewData, stateDataFragment).commit();
 
 
                     }
                 });
 
 
-                Log.d("TEST", "Data haettu");
-                fragment = new StateDataFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, fragment).commit();
+
 
             }
         });

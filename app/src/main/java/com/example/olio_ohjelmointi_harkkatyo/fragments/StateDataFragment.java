@@ -68,8 +68,13 @@ public class StateDataFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_state_data, container, false);
+
+        // Set data to Recyclerview
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewData);
+
+
         recyclerView.setAdapter(new StateDataAdapter(this.getContext(), StateDataStorage.getInstance().getStateData()));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 

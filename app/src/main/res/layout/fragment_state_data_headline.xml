@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/Headline"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    tools:context=".fragments.StateDataHeadlineFragment">
+
+    <TextView
+        android:id="@+id/textViewHeadlineYear"
+        android:layout_width="68dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center|fill_vertical"
+        android:text="Vuosi" />
+
+    <TextView
+        android:id="@+id/textViewHeadlinePopulation"
+        android:layout_width="42dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center|fill_vertical"
+        android:text="Asukas- luku" />
+
+    <TextView
+        android:id="@+id/textViewHeadlinePopulationChange"
+        android:layout_width="71dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center|fill_vertical"
+        android:text="Asukasluvun muutos" />
+
+    <TextView
+        android:id="@+id/textViewHeadlineWorkPlace"
+        android:layout_width="77dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center|fill_vertical"
+        android:text="Työpaikka- omavaraisuus %" />
+
+    <TextView
+        android:id="@+id/textViewHeadlineEmpolyment"
+        android:layout_width="54dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center|fill_vertical"
+        android:text="Työllisyys- aste %" />
+</LinearLayout>

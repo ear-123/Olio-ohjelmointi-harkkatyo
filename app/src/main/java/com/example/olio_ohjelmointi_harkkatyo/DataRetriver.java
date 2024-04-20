@@ -1,5 +1,6 @@
 package com.example.olio_ohjelmointi_harkkatyo;
 import android.content.Context;
+import android.util.Log;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,13 +17,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DataRetriver {
-    private HashMap<String, String> stateNamesToCodes;
+    private HashMap<String, String> stateNamesToCodes = new HashMap<String, String>();
+    private static DataRetriver dataRetriver = null;
 
+    private DataRetriver(){
 
-    public void getStateData(Context context, String stateName){
+    }
 
-        StateDataStorage.getInstance().getStateData().clear();
-
+    private void generateStateNamesToCodesTable(){
         ObjectMapper objectMapper = new ObjectMapper();
 
         JsonNode areas = null;
@@ -49,18 +51,23 @@ public class DataRetriver {
             keys.add(node.asText());
         }
 
-        HashMap<String, String> municipalityCodes = new HashMap<>();
-
         for(int i = 0; i < keys.size(); i++) {
-            municipalityCodes.put(keys.get(i), values.get(i));
+            stateNamesToCodes.put(keys.get(i), values.get(i));
         }
+    }
 
-        String code = null;
-        code = municipalityCodes.get(stateName);
+    public static DataRetriver getInstance(){
+        if (dataRetriver == null) {
+            dataRetriver = new DataRetriver();
+            dataRetriver.generateStateNamesToCodesTable();
 
+        }
+        return dataRetriver;
+    }
 
+    private JsonNode dataQuery(Context context, String stateCode, URL url, int queryFile){
         try {
-            URL url = new URL("https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/synt/statfin_synt_pxt_12dy.px");
+            ObjectMapper objectMapper = new ObjectMapper();
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -68,41 +75,23 @@ public class DataRetriver {
             con.setRequestProperty("Accept", "application/json");
             con.setDoOutput(true);
 
+            JsonNode jsonInputString = objectMapper.readTree(context.getResources().openRawResource(queryFile));
 
-            JsonNode jsonInputString = objectMapper.readTree(context.getResources().openRawResource(R.raw.query));
-
-            ((ObjectNode) jsonInputString.get("query").get(0).get("selection")).putArray("values").add(code);
+            ((ObjectNode) jsonInputString.get("query").get(0).get("selection")).putArray("values").add(stateCode);
 
             byte[] input = objectMapper.writeValueAsBytes(jsonInputString);
             OutputStream os = con.getOutputStream();
             os.write(input, 0, input.length);
 
-
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
             StringBuilder response = new StringBuilder();
+
             String line = null;
             while ((line = br.readLine()) != null) {
                 response.append(line.trim());
             }
 
-            JsonNode municipalityData = objectMapper.readTree(response.toString());
-
-            ArrayList<String> years = new ArrayList<>();
-            ArrayList<String> populations = new ArrayList<>();
-
-            for (JsonNode node : municipalityData.get("dimension").get("Vuosi").get("category").get("label")) {
-                years.add(node.asText());
-            }
-
-            for (JsonNode node : municipalityData.get("value")) {
-                populations.add(node.asText());
-            }
-
-
-            for(int i = 0; i < years.size(); i++) {
-                StateDataStorage.getInstance().getStateData().add(new StateData(Integer.valueOf(years.get(i)), Integer.valueOf(populations.get(i)), 1, "test", "test"));
-            }
-
+            return objectMapper.readTree(response.toString());
 
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
@@ -111,6 +100,67 @@ public class DataRetriver {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return null;
+    }
+
+    public void getStateData(Context context, String stateName){
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String stateCode = stateNamesToCodes.get(stateName);
+
+        URL populationUrl = null;
+        URL workPlaceUrl = null;
+        URL emplymentUrl = null;
+
+        try {
+            populationUrl = new URL("https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/synt/statfin_synt_pxt_12dy.px");
+            workPlaceUrl = new URL("https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyokay/statfin_tyokay_pxt_125s.px");
+            emplymentUrl = new URL("https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyokay/statfin_tyokay_pxt_115x.px");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        JsonNode workPlaceData = dataQuery(context, stateCode, workPlaceUrl, R.raw.work_place_query);
+        //Log.d("TEST", workPlaceData.toPrettyString());
+
+        JsonNode populationData = dataQuery(context, stateCode, populationUrl, R.raw.population_query);
+        //Log.d("TEST", populationData.toPrettyString());
+
+        JsonNode populationChangeData = dataQuery(context, stateCode, populationUrl, R.raw.population_change_query);
+
+        JsonNode employmentData = dataQuery(context, stateCode, emplymentUrl, R.raw.employment_query);
+        //Log.d("TEST", employmentData.toPrettyString());
+
+        ArrayList<String> years = new ArrayList<>();
+        ArrayList<String> population = new ArrayList<>();
+        ArrayList<String> populationChange = new ArrayList<>();
+        ArrayList<String> workPlace = new ArrayList<>();
+        ArrayList<String> employment = new ArrayList<>();
+
+        for (JsonNode node : populationData.get("dimension").get("Vuosi").get("category").get("label")) {
+            years.add(node.asText());
+        }
+        for (JsonNode node : populationData.get("value")) {
+            population.add(node.asText());
+        }
+        for (JsonNode node : populationChangeData.get("value")){
+            populationChange.add(node.asText());
+        }
+        for (JsonNode node : workPlaceData.get("value")) {
+            workPlace.add(node.asText());
+        }
+        for (JsonNode node : employmentData.get("value")) {
+            employment.add(node.asText());
+        }
+
+        StateDataStorage.getInstance().getStateData().clear();
+        for(int i = 0; i < years.size(); i++) {
+            StateDataStorage.getInstance().addStateData(new StateData(Integer.parseInt(years.get(i)), Integer.parseInt(population.get(i)), Integer.parseInt(populationChange.get(i)), workPlace.get(i), employment.get(i)));
+        }
+
+
+
 
 
     }
