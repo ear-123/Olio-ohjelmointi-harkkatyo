@@ -24,6 +24,15 @@ public class DataRetriver {
 
     }
 
+    public static DataRetriver getInstance(){
+        if (dataRetriver == null) {
+            dataRetriver = new DataRetriver();
+            dataRetriver.generateStateNamesToCodesTable();
+
+        }
+        return dataRetriver;
+    }
+
     private void generateStateNamesToCodesTable(){
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,15 +63,6 @@ public class DataRetriver {
         for(int i = 0; i < keys.size(); i++) {
             stateNamesToCodes.put(keys.get(i), values.get(i));
         }
-    }
-
-    public static DataRetriver getInstance(){
-        if (dataRetriver == null) {
-            dataRetriver = new DataRetriver();
-            dataRetriver.generateStateNamesToCodesTable();
-
-        }
-        return dataRetriver;
     }
 
     private JsonNode dataQuery(Context context, String stateCode, URL url, int queryFile){

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.olio_ohjelmointi_harkkatyo.R;
 
@@ -61,6 +62,16 @@ public class StateDataNotFoundFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_state_data_not_found, container, false);
+        View view = inflater.inflate(R.layout.fragment_state_data_not_found, container, false);
+
+        TextView textView = view.findViewById(R.id.TextViewHint);
+        if (getArguments() != null) {
+            String text = "'"+getArguments().getString("notAState") + "' ei ole kunta.";
+            textView.setText(text);
+        }
+
+
+
+        return view;
     }
 }

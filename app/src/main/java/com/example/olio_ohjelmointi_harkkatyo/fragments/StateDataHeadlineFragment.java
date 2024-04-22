@@ -16,7 +16,6 @@ import com.example.olio_ohjelmointi_harkkatyo.R;
 
 public class StateDataHeadlineFragment extends Fragment {
 
-    private StateDataHeadlineViewModel mViewModel;
 
     public static StateDataHeadlineFragment newInstance() {
         return new StateDataHeadlineFragment();
@@ -31,8 +30,6 @@ public class StateDataHeadlineFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(StateDataHeadlineViewModel.class);
-        // TODO: Use the ViewModel
     }
 
 }

@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
                     DataRetriver.getInstance().getStateData(context, stateName);
                 } catch (NullPointerException e){
                     Fragment fragment = new StateDataNotFoundFragment();
+                    Bundle argument = new Bundle();
+                    argument.putString("notAState", searchBar.getText().toString());
+                    fragment.setArguments(argument);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewHeadline, fragment).commit();
                     Log.d("TEST", "Dataa ei löytynyt");
                     return;
